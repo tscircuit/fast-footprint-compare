@@ -1,0 +1,36 @@
+{
+  "name": "fast-footprint-compare",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c \"#f59e0b,#0f766e\" \"bunx tsx watch server/index.ts\" \"vite\"",
+    "build": "vite build",
+    "start": "bunx tsx server/index.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json && tsc --noEmit -p tsconfig.node.json"
+  },
+  "dependencies": {
+    "@tscircuit/footprinter": "^0.0.360",
+    "circuit-json": "^0.0.438",
+    "easyeda": "^0.0.271",
+    "express": "^5.2.1",
+    "format-si-unit": "^0.0.7",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^10.0.3",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "tsx": "^4.22.4",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.0"
+  }
+}
