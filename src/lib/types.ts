@@ -23,6 +23,7 @@ export interface FootprintPreview {
 }
 
 export interface CompareResponse {
+  copperIntersectionOverUnion: number
   left: FootprintPreview
   right: FootprintPreview
 }

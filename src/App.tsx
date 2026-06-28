@@ -415,13 +415,13 @@ function App() {
             <>
               <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <article className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
-                  <div className={sectionLabelClass}>Pad IoU</div>
+                  <div className={sectionLabelClass}>Copper IoU</div>
                   <div className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">
-                    {formatPercent(comparison.iou)}
+                    {formatPercent(compareResponse.copperIntersectionOverUnion)}
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-600">
-                    Intersection over union from rasterized pad geometry after
-                    auto-centering both footprints.
+                    Returned directly by the comparison API as
+                    `copperIntersectionOverUnion`.
                   </p>
                 </article>
 
