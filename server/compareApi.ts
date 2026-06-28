@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { summarizeCopperComparison } from './copperComparison.js'
 import {
   buildFootprinterPreview,
   buildJlcpcbPreview,
@@ -10,6 +11,7 @@ import {
 const directJlcPartNumberPattern = /^C\d+$/i
 
 export interface CompareResponse {
+  copperIntersectionOverUnion: number
   left: FootprintPreview
   right: FootprintPreview
 }
@@ -161,9 +163,15 @@ export const handleCompareRequest = async (
       Promise.resolve(buildFootprinterPreview(parsed.data.footprinterString)),
       buildJlcpcbPreview(parsed.data.jlcpcbPartNumber),
     ])
+    const copperComparison = summarizeCopperComparison(left, right)
 
     return {
-      body: { left, right },
+      body: {
+        copperIntersectionOverUnion:
+          copperComparison.copperIntersectionOverUnion,
+        left,
+        right,
+      },
       status: 200,
     }
   } catch (error) {

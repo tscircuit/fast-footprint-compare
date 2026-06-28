@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { summarizeCopperComparison } from './copperComparison.js'
 
 const directJlcPartNumberPattern = /^C(\d+)$/i
 const compareRequestSchema = z.object({
@@ -452,9 +453,15 @@ const handleCompareRequest = async (requestBody) => {
       buildFootprinterPreview(parsed.data.footprinterString),
       buildJlcpcbPreview(parsed.data.jlcpcbPartNumber),
     ])
+    const copperComparison = summarizeCopperComparison(left, right)
 
     return {
-      body: { left, right },
+      body: {
+        copperIntersectionOverUnion:
+          copperComparison.copperIntersectionOverUnion,
+        left,
+        right,
+      },
       status: 200,
     }
   } catch (error) {
