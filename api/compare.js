@@ -109,7 +109,13 @@ const normalizeShape = (shape, width, height) => {
   const lowerShape = typeof shape === 'string' ? shape.toLowerCase() : 'rect'
 
   if (lowerShape === 'circle' || lowerShape === 'ellipse') return 'circle'
-  if (lowerShape === 'pill' || lowerShape === 'oval') return 'pill'
+  if (
+    lowerShape === 'pill' ||
+    lowerShape === 'oval' ||
+    lowerShape === 'rotated_pill'
+  ) {
+    return 'pill'
+  }
   if (Math.abs(width - height) < 0.00001 && lowerShape === 'round') return 'circle'
   return 'rect'
 }
@@ -170,11 +176,75 @@ const getPadCornerRadius = (element, width, height) => {
   return Math.min(radius, width / 2, height / 2)
 }
 
+const getPlatedHolePadGeometry = (element) => {
+  const elementShape = String(element.shape ?? 'circle').toLowerCase()
+  const hasRectPad =
+    element.pad_shape === 'rect' || elementShape.includes('with_rect_pad')
+  const outerDiameter = toNumber(
+    element.outer_diameter ?? element.outerDiameter,
+    0.6,
+  )
+  const width = hasRectPad
+    ? toNumber(
+        element.rect_pad_width ?? element.outer_width ?? element.width,
+        outerDiameter,
+      )
+    : toNumber(element.outer_width ?? element.width, outerDiameter)
+  const height = hasRectPad
+    ? toNumber(
+        element.rect_pad_height ?? element.outer_height ?? element.height,
+        width,
+      )
+    : toNumber(element.outer_height ?? element.height, width)
+  const shape = hasRectPad
+    ? normalizeShape(element.pad_shape ?? 'rect', width, height)
+    : normalizeShape(elementShape, width, height)
+  const rotation = hasRectPad
+    ? toNumber(
+        element.rect_ccw_rotation ?? element.ccw_rotation ?? element.rotation,
+      )
+    : toNumber(element.ccw_rotation ?? element.rotation)
+
+  return { height, rotation, shape, width }
+}
+
+const getPlatedHoleGeometry = (element) => {
+  const elementShape = String(element.shape ?? 'circle').toLowerCase()
+  const rawHoleShape = String(
+    element.hole_shape ??
+      (elementShape === 'circle' ||
+      elementShape === 'oval' ||
+      elementShape === 'pill'
+        ? elementShape
+        : 'circle'),
+  ).toLowerCase()
+  const holeDiameter = toNumber(element.hole_diameter)
+  const width = toNumber(element.hole_width, holeDiameter)
+  const height = toNumber(element.hole_height, width)
+  if (width <= 0 || height <= 0) return undefined
+
+  return {
+    height,
+    offsetX: toNumber(element.hole_offset_x),
+    offsetY: toNumber(element.hole_offset_y),
+    rotation: toNumber(
+      element.hole_ccw_rotation ??
+        (elementShape === 'oval' || elementShape === 'pill'
+          ? element.ccw_rotation
+          : undefined) ??
+        element.rotation,
+    ),
+    shape: normalizeShape(rawHoleShape, width, height),
+    width,
+  }
+}
+
 const extractPads = (circuitJson) =>
   circuitJson.flatMap((element, index) => {
     if (element.type === 'pcb_smtpad') {
-      const width = toNumber(element.width)
-      const height = toNumber(element.height)
+      const diameter = toNumber(element.radius) * 2
+      const width = toNumber(element.width, diameter)
+      const height = toNumber(element.height, width)
 
       return [
         {
@@ -186,7 +256,7 @@ const extractPads = (circuitJson) =>
           portHints: Array.isArray(element.port_hints)
             ? element.port_hints.map((hint) => normalizePortHint(String(hint)))
             : [],
-          rotation: toNumber(element.rotation),
+          rotation: toNumber(element.ccw_rotation ?? element.rotation),
           shape: normalizeShape(element.shape, width, height),
           width,
           x: toNumber(element.x),
@@ -196,16 +266,14 @@ const extractPads = (circuitJson) =>
     }
 
     if (element.type === 'pcb_plated_hole') {
-      const width = toNumber(
-        element.width ?? element.outer_diameter ?? element.outerDiameter,
-        0.6,
-      )
-      const height = toNumber(element.height, width)
+      const { height, rotation, shape, width } =
+        getPlatedHolePadGeometry(element)
 
       return [
         {
           cornerRadius: getPadCornerRadius(element, width, height),
           height,
+          hole: getPlatedHoleGeometry(element),
           id: String(element.pcb_plated_hole_id ?? `pcb_plated_hole_${index + 1}`),
           kind: 'plated-hole',
           layer: Array.isArray(element.layers)
@@ -214,8 +282,8 @@ const extractPads = (circuitJson) =>
           portHints: Array.isArray(element.port_hints)
             ? element.port_hints.map((hint) => normalizePortHint(String(hint)))
             : [],
-          rotation: toNumber(element.rotation),
-          shape: normalizeShape(element.shape ?? 'circle', width, height),
+          rotation,
+          shape,
           width,
           x: toNumber(element.x),
           y: toNumber(element.y),
@@ -459,6 +527,8 @@ const handleCompareRequest = async (requestBody) => {
       body: {
         copperIntersectionOverUnion:
           copperComparison.copperIntersectionOverUnion,
+        holeIntersectionOverUnion:
+          copperComparison.holeIntersectionOverUnion,
         left,
         right,
       },

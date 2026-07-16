@@ -12,6 +12,7 @@ const directJlcPartNumberPattern = /^C\d+$/i
 
 export interface CompareResponse {
   copperIntersectionOverUnion: number
+  holeIntersectionOverUnion: number
   left: FootprintPreview
   right: FootprintPreview
 }
@@ -169,6 +170,8 @@ export const handleCompareRequest = async (
       body: {
         copperIntersectionOverUnion:
           copperComparison.copperIntersectionOverUnion,
+        holeIntersectionOverUnion:
+          copperComparison.holeIntersectionOverUnion,
         left,
         right,
       },

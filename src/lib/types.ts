@@ -2,9 +2,19 @@ export type PreviewPadShape = 'circle' | 'pill' | 'rect'
 export type PreviewPadKind = 'plated-hole' | 'smt'
 export type InputField = 'footprinterString' | 'jlcpcbPartNumber'
 
+export interface PreviewHole {
+  height: number
+  offsetX: number
+  offsetY: number
+  rotation: number
+  shape: PreviewPadShape
+  width: number
+}
+
 export interface PreviewPad {
   cornerRadius?: number
   height: number
+  hole?: PreviewHole
   id: string
   kind: PreviewPadKind
   layer: string
@@ -25,6 +35,7 @@ export interface FootprintPreview {
 
 export interface CompareResponse {
   copperIntersectionOverUnion: number
+  holeIntersectionOverUnion: number
   left: FootprintPreview
   right: FootprintPreview
 }

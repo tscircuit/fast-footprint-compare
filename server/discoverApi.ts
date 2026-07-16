@@ -28,6 +28,7 @@ export interface DiscoverResponse {
   candidates: FootprinterDiscoveryCandidate[]
   comparison: {
     copperIntersectionOverUnion: number
+    holeIntersectionOverUnion: number
     left: FootprintPreview
     right: FootprintPreview
   }
@@ -115,10 +116,9 @@ export const handleDiscoverRequest = async (
     }
 
     const left = buildFootprinterPreview(discovery.best.footprinterString)
-    const copperIntersectionOverUnion = summarizeCopperComparison(
-      left,
-      target,
-    ).copperIntersectionOverUnion
+    const comparison = summarizeCopperComparison(left, target)
+    const { copperIntersectionOverUnion, holeIntersectionOverUnion } =
+      comparison
     const best = {
       ...discovery.best,
       copperIntersectionOverUnion,
@@ -134,6 +134,7 @@ export const handleDiscoverRequest = async (
         ),
         comparison: {
           copperIntersectionOverUnion,
+          holeIntersectionOverUnion,
           left,
           right: target,
         },

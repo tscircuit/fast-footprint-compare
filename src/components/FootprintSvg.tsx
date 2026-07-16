@@ -53,6 +53,53 @@ const padElement = (pad: PreviewPad, accent: string, fillOpacity: number) => {
   )
 }
 
+const holeElement = (pad: PreviewPad, accent: string) => {
+  if (!pad.hole) return null
+
+  const centerX = pad.x + pad.hole.offsetX
+  const centerY = pad.y + pad.hole.offsetY
+  const commonProps = {
+    fill: '#020617',
+    fillOpacity: 0.96,
+    stroke: accent,
+    strokeOpacity: 0.92,
+    strokeWidth: 0.07,
+  }
+
+  if (pad.hole.shape === 'circle') {
+    return (
+      <ellipse
+        {...commonProps}
+        cx={centerX}
+        cy={-centerY}
+        rx={pad.hole.width / 2}
+        ry={pad.hole.height / 2}
+      />
+    )
+  }
+
+  const cornerRadius =
+    pad.hole.shape === 'pill'
+      ? Math.min(pad.hole.width, pad.hole.height) / 2
+      : 0
+
+  return (
+    <rect
+      {...commonProps}
+      x={centerX - pad.hole.width / 2}
+      y={-centerY - pad.hole.height / 2}
+      width={pad.hole.width}
+      height={pad.hole.height}
+      rx={cornerRadius}
+      transform={
+        pad.hole.rotation
+          ? `rotate(${-pad.hole.rotation} ${centerX} ${-centerY})`
+          : undefined
+      }
+    />
+  )
+}
+
 export function FootprintSvg({
   layers,
   showLabels = true,
@@ -152,6 +199,7 @@ export function FootprintSvg({
               key={`${layer.label}-${pad.id || pad.portHints.join('-') || padIndex}`}
             >
               {padElement(pad, layer.accent, layer.fillOpacity)}
+              {holeElement(pad, layer.accent)}
               {showLabels ? (
                 <text
                   x={pad.x}
