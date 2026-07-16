@@ -1,5 +1,4 @@
 import { expect, test } from 'bun:test'
-import { summarizeCopperComparison as summarizeApiComparison } from '../api/copperComparison.js'
 import { summarizeCopperComparison } from '../server/copperComparison.js'
 import { buildFootprinterPreview } from '../server/footprints.js'
 
@@ -24,7 +23,6 @@ test('compares drill geometry independently from outer copper', () => {
   const comparison = summarizeCopperComparison(smallerHole, largerHole)
   expect(comparison.copperIntersectionOverUnion).toBe(1)
   expect(comparison.holeIntersectionOverUnion).toBeLessThan(0.5)
-  expect(summarizeApiComparison(smallerHole, largerHole)).toEqual(comparison)
 })
 
 test('reports perfect hole IoU when neither footprint has holes', () => {

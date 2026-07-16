@@ -97,17 +97,6 @@ export const createInvalidJsonResponse = (): CompareApiResult => ({
   status: 400,
 })
 
-export const createMethodNotAllowedResponse = (): CompareApiResult => ({
-  body: {
-    error: {
-      code: 'METHOD_NOT_ALLOWED',
-      hint: 'Use POST /api/compare.',
-      message: 'Only POST is supported on this endpoint.',
-    },
-  },
-  status: 405,
-})
-
 const createPreviewErrorResponse = (error: PreviewBuildError): CompareApiResult => ({
   body: {
     error: {
