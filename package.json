@@ -13,7 +13,7 @@
   "dependencies": {
     "@tscircuit/footprinter": "^0.0.378",
     "circuit-json": "^0.0.438",
-    "circuit-json-to-footprinter": "^0.0.4",
+    "circuit-json-to-footprinter": "^0.0.8",
     "easyeda": "^0.0.271",
     "express": "^5.2.1",
     "react": "^19.2.7",
