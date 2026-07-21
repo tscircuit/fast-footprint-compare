@@ -1,12 +1,13 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "fast-footprint-compare",
       "dependencies": {
         "@tscircuit/footprinter": "^0.0.378",
         "circuit-json": "^0.0.438",
-        "circuit-json-to-footprinter": "^0.0.4",
+        "circuit-json-to-footprinter": "^0.0.7",
         "easyeda": "^0.0.271",
         "express": "^5.2.1",
         "format-si-unit": "^0.0.7",
@@ -213,7 +214,7 @@
 
     "circuit-json": ["circuit-json@0.0.438", "", {}, "sha512-aZiroCeGymKFRZcKzSGA6Ojzjz252NJXBNaRnLn2FjWNmsRm38Kyb3rJWnHt5ALyAobsXCzE51Fn5Hy04WrFaQ=="],
 
-    "circuit-json-to-footprinter": ["circuit-json-to-footprinter@0.0.4", "", { "dependencies": { "@tscircuit/footprinter": "^0.0.377", "circuit-json": "^0.0.448", "format-si-unit": "^0.0.10" } }, "sha512-BO9Os3/GFr1fKAVgM+8x8L9t1S618+i92g92aokNaUFRxT+1i9OB5Vl0EM1QzZRU9+n+ezPWqQ3VK0eM3SeRwQ=="],
+    "circuit-json-to-footprinter": ["circuit-json-to-footprinter@0.0.7", "", { "dependencies": { "@tscircuit/footprinter": "^0.0.380", "circuit-json": "^0.0.448", "format-si-unit": "^0.0.10" } }, "sha512-yD7FWLjvG44EuBvgwvRHS9Vekt+mSZG1esJcgkbWtS2k6xLuE66BK3qOxVOqHqTLgVxF5xz16La32FWv18zsfA=="],
 
     "cliui": ["cliui@9.0.1", "", { "dependencies": { "string-width": "^7.2.0", "strip-ansi": "^7.1.0", "wrap-ansi": "^9.0.0" } }, "sha512-k7ndgKhwoQveBL+/1tqGJYNz097I7WOvwbmmU2AR5+magtbjPWQTS1C5vzGkBC8Ym8UWRzfKUzUUqFLypY4Q+w=="],
 
@@ -541,7 +542,7 @@
 
     "chokidar/glob-parent": ["glob-parent@5.1.2", "", { "dependencies": { "is-glob": "^4.0.1" } }, "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow=="],
 
-    "circuit-json-to-footprinter/@tscircuit/footprinter": ["@tscircuit/footprinter@0.0.377", "", { "dependencies": { "@tscircuit/mm": "^0.0.8", "zod": "^3.23.8" }, "peerDependencies": { "circuit-json": "*" } }, "sha512-mYMRQgMsYKIUcSAPfobr8yv6Fx1tU66cfkI61+MfEPGg3K3uU4fY+CVFtdfIoI89wLMDt43DOFkH2BO1mwZz+A=="],
+    "circuit-json-to-footprinter/@tscircuit/footprinter": ["@tscircuit/footprinter@0.0.380", "", { "dependencies": { "@tscircuit/mm": "^0.0.8", "zod": "^3.23.8" }, "peerDependencies": { "circuit-json": "*" } }, "sha512-gnb2T2fN4K9aiuuNY2XJBspNgxqTu63u4zj+RTCabY+3TpB7VFAwBuBjW3jKoLNIlHd0KGkNmroEdtxnVZlOCQ=="],
 
     "circuit-json-to-footprinter/circuit-json": ["circuit-json@0.0.448", "", {}, "sha512-4qKp+2/aNoynSckOBRg6UcxkySX9XNi9FeXZG8PbTZexPKHUW4HOnuab7UA4SW0YLnppUtCCgx461YEA8ruFqw=="],
 
