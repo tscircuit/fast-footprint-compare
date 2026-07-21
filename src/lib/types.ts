@@ -1,58 +1,32 @@
-export type PreviewPadShape = 'circle' | 'pill' | 'rect'
-export type PreviewPadKind = 'plated-hole' | 'smt'
+import type {
+  Bounds,
+  FootprintPreview,
+  FootprinterDiscoveryCandidate,
+  PreviewHole,
+  PreviewPad,
+  PreviewPadKind,
+  PreviewPadShape,
+  RasterComparison,
+} from 'circuit-json-to-footprinter'
+
+export type {
+  Bounds,
+  FootprintPreview,
+  FootprinterDiscoveryCandidate,
+  PreviewHole,
+  PreviewPad,
+  PreviewPadKind,
+  PreviewPadShape,
+  RasterComparison,
+}
+
 export type InputField = 'footprinterString' | 'jlcpcbPartNumber'
-
-export interface PreviewHole {
-  height: number
-  offsetX: number
-  offsetY: number
-  rotation: number
-  shape: PreviewPadShape
-  width: number
-}
-
-export interface PreviewPad {
-  cornerRadius?: number
-  height: number
-  hole?: PreviewHole
-  id: string
-  kind: PreviewPadKind
-  layer: string
-  portHints: string[]
-  rotation: number
-  shape: PreviewPadShape
-  width: number
-  x: number
-  y: number
-}
-
-export interface FootprintPreview {
-  pads: PreviewPad[]
-  sourceHints?: string[]
-  subtitle: string
-  title: string
-}
 
 export interface CompareResponse {
   copperIntersectionOverUnion: number
   holeIntersectionOverUnion: number
   left: FootprintPreview
   right: FootprintPreview
-}
-
-export interface FootprinterDiscoveryCandidate {
-  copperIntersectionOverUnion: number
-  domainScore: number
-  family: string
-  footprinterString: string
-  geometryScore: number
-  optimizedParameters: Partial<
-    Record<
-      'p' | 'w' | 'h' | 'pw' | 'ph' | 'pl' | 'pad' | 'ball' | 'od' | 'id',
-      number
-    >
-  >
-  rankingScore: number
 }
 
 export interface DiscoverResponse {
@@ -77,26 +51,4 @@ export interface ApiErrorPayload {
 
 export interface ApiErrorResponse {
   error: ApiErrorPayload
-}
-
-export interface Bounds {
-  height: number
-  maxX: number
-  maxY: number
-  minX: number
-  minY: number
-  width: number
-}
-
-export interface RasterComparison {
-  coverageLeft: number
-  coverageRight: number
-  gridSize: number
-  iou: number
-  leftOnlyRatio: number
-  normalizedLeft: FootprintPreview
-  normalizedRight: FootprintPreview
-  occupancy: Uint8Array
-  padCountMatch: boolean
-  rightOnlyRatio: number
 }

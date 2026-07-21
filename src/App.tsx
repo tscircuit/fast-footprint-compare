@@ -1,7 +1,8 @@
 import { useMemo, useState, useTransition, type FormEvent } from 'react'
+import { compareFootprints } from 'circuit-json-to-footprinter/compare'
 import { DiffHeatmap } from './components/DiffHeatmap'
 import { FootprintSvg } from './components/FootprintSvg'
-import { compareFootprints, formatPercent } from './lib/footprintMath'
+import { formatPercent } from './lib/formatPercent'
 import type {
   ApiErrorResponse,
   ApiErrorPayload,

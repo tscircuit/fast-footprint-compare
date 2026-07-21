@@ -16,7 +16,6 @@
     "circuit-json-to-footprinter": "^0.0.4",
     "easyeda": "^0.0.271",
     "express": "^5.2.1",
-    "format-si-unit": "^0.0.7",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "zod": "^3.25.67"

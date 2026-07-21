@@ -1,23 +1,16 @@
-import { fp } from '@tscircuit/footprinter'
-import type { AnyCircuitElement } from 'circuit-json'
+import {
+  circuitJsonToPreview,
+  footprinterStringToPreview,
+  type FootprintPreview,
+} from 'circuit-json-to-footprinter'
 import {
   EasyEdaJsonSchema,
   convertEasyEdaJsonToCircuitJson,
   fetchEasyEDAComponent,
 } from 'easyeda'
 
-type PreviewPadShape = 'circle' | 'pill' | 'rect'
-type PreviewPadKind = 'plated-hole' | 'smt'
+export type { FootprintPreview } from 'circuit-json-to-footprinter'
 export type InputField = 'footprinterString' | 'jlcpcbPartNumber'
-
-export interface PreviewHole {
-  height: number
-  offsetX: number
-  offsetY: number
-  rotation: number
-  shape: PreviewPadShape
-  width: number
-}
 
 const directJlcPartNumberPattern = /^C(\d+)$/i
 
@@ -59,69 +52,6 @@ export class PreviewBuildError extends Error {
     this.name = 'PreviewBuildError'
     this.status = status
   }
-}
-
-export interface PreviewPad {
-  cornerRadius?: number
-  height: number
-  hole?: PreviewHole
-  id: string
-  kind: PreviewPadKind
-  layer: string
-  portHints: string[]
-  rotation: number
-  shape: PreviewPadShape
-  width: number
-  x: number
-  y: number
-}
-
-export interface FootprintPreview {
-  pads: PreviewPad[]
-  sourceHints?: string[]
-  subtitle: string
-  title: string
-}
-
-type CircuitElement = AnyCircuitElement & Record<string, unknown>
-
-const normalizePortHint = (hint: string) => {
-  const trimmed = hint.trim()
-  const pinMatch = trimmed.match(/^pin(\d+)$/i)
-  if (pinMatch) return `pin${pinMatch[1]}`
-
-  const numericMatch = trimmed.match(/^(\d+)$/)
-  if (numericMatch) return `pin${numericMatch[1]}`
-
-  return trimmed
-}
-
-const normalizeShape = (
-  shape: unknown,
-  width: number,
-  height: number,
-): PreviewPadShape => {
-  const lowerShape = typeof shape === 'string' ? shape.toLowerCase() : 'rect'
-
-  if (lowerShape === 'circle' || lowerShape === 'ellipse') return 'circle'
-  if (
-    lowerShape === 'pill' ||
-    lowerShape === 'oval' ||
-    lowerShape === 'rotated_pill'
-  ) {
-    return 'pill'
-  }
-  if (Math.abs(width - height) < 0.00001 && lowerShape === 'round') return 'circle'
-  return 'rect'
-}
-
-const toNumber = (value: unknown, fallback = 0) => {
-  if (typeof value === 'number' && Number.isFinite(value)) return value
-  if (typeof value === 'string') {
-    const parsed = Number.parseFloat(value)
-    if (Number.isFinite(parsed)) return parsed
-  }
-  return fallback
 }
 
 const getErrorMessage = (error: unknown) =>
@@ -169,14 +99,23 @@ const createFootprinterBuildError = (
   error: unknown,
 ): PreviewBuildError => {
   const message = getErrorMessage(error).trim()
+  const hasNoPads = message.includes(
+    'must contain at least one PCB SMT pad or plated hole',
+  )
 
   return new PreviewBuildError({
-    code: message.includes('Invalid footprint function')
-      ? 'FOOTPRINTER_INVALID'
-      : 'FOOTPRINTER_BUILD_FAILED',
+    code: hasNoPads
+      ? 'FOOTPRINTER_NO_PADS'
+      : message.includes('Invalid footprint function')
+        ? 'FOOTPRINTER_INVALID'
+        : 'FOOTPRINTER_BUILD_FAILED',
     field: 'footprinterString',
-    hint: 'Only footprint strings that @tscircuit/footprinter can build are accepted here.',
-    message: message || `Footprinter could not build "${footprinterString}".`,
+    hint: hasNoPads
+      ? 'Use a footprinter string that generates actual PCB pads.'
+      : 'Only footprint strings that @tscircuit/footprinter can build are accepted here.',
+    message: hasNoPads
+      ? `Footprinter built "${footprinterString}" but it did not produce any PCB pads.`
+      : message || `Footprinter could not build "${footprinterString}".`,
   })
 }
 
@@ -205,139 +144,6 @@ const normalizeJlcpcbPartNumber = (jlcpcbPartNumber: string) => {
   return `C${directPartMatch[1]}`
 }
 
-const getPadCornerRadius = (
-  element: CircuitElement,
-  width: number,
-  height: number,
-) => {
-  const radius = toNumber(
-    element.corner_radius ?? element.cornerRadius ?? element.rect_border_radius,
-  )
-
-  if (radius <= 0) return undefined
-  return Math.min(radius, width / 2, height / 2)
-}
-
-const getPlatedHolePadGeometry = (element: CircuitElement) => {
-  const elementShape = String(element.shape ?? 'circle').toLowerCase()
-  const hasRectPad =
-    element.pad_shape === 'rect' || elementShape.includes('with_rect_pad')
-  const outerDiameter = toNumber(
-    element.outer_diameter ?? element.outerDiameter,
-    0.6,
-  )
-  const width = hasRectPad
-    ? toNumber(
-        element.rect_pad_width ?? element.outer_width ?? element.width,
-        outerDiameter,
-      )
-    : toNumber(element.outer_width ?? element.width, outerDiameter)
-  const height = hasRectPad
-    ? toNumber(
-        element.rect_pad_height ?? element.outer_height ?? element.height,
-        width,
-      )
-    : toNumber(element.outer_height ?? element.height, width)
-  const shape = hasRectPad
-    ? normalizeShape(element.pad_shape ?? 'rect', width, height)
-    : normalizeShape(elementShape, width, height)
-  const rotation = hasRectPad
-    ? toNumber(
-        element.rect_ccw_rotation ?? element.ccw_rotation ?? element.rotation,
-      )
-    : toNumber(element.ccw_rotation ?? element.rotation)
-
-  return { height, rotation, shape, width }
-}
-
-const getPlatedHoleGeometry = (
-  element: CircuitElement,
-): PreviewHole | undefined => {
-  const elementShape = String(element.shape ?? 'circle').toLowerCase()
-  const rawHoleShape = String(
-    element.hole_shape ??
-      (elementShape === 'circle' ||
-      elementShape === 'oval' ||
-      elementShape === 'pill'
-        ? elementShape
-        : 'circle'),
-  ).toLowerCase()
-  const holeDiameter = toNumber(element.hole_diameter)
-  const width = toNumber(element.hole_width, holeDiameter)
-  const height = toNumber(element.hole_height, width)
-  if (width <= 0 || height <= 0) return undefined
-
-  return {
-    height,
-    offsetX: toNumber(element.hole_offset_x),
-    offsetY: toNumber(element.hole_offset_y),
-    rotation: toNumber(
-      element.hole_ccw_rotation ??
-        (elementShape === 'oval' || elementShape === 'pill'
-          ? element.ccw_rotation
-          : undefined) ??
-        element.rotation,
-    ),
-    shape: normalizeShape(rawHoleShape, width, height),
-    width,
-  }
-}
-
-const extractPads = (circuitJson: CircuitElement[]) =>
-  circuitJson.flatMap((element, index): PreviewPad[] => {
-    if (element.type === 'pcb_smtpad') {
-      const diameter = toNumber(element.radius) * 2
-      const width = toNumber(element.width, diameter)
-      const height = toNumber(element.height, width)
-
-      return [
-        {
-          cornerRadius: getPadCornerRadius(element, width, height),
-          height,
-          id: String(element.pcb_smtpad_id ?? `pcb_smtpad_${index + 1}`),
-          kind: 'smt',
-          layer: String(element.layer ?? 'top'),
-          portHints: Array.isArray(element.port_hints)
-            ? element.port_hints.map((hint) => normalizePortHint(String(hint)))
-            : [],
-          rotation: toNumber(element.ccw_rotation ?? element.rotation),
-          shape: normalizeShape(element.shape, width, height),
-          width,
-          x: toNumber(element.x),
-          y: toNumber(element.y),
-        },
-      ]
-    }
-
-    if (element.type === 'pcb_plated_hole') {
-      const { height, rotation, shape, width } =
-        getPlatedHolePadGeometry(element)
-
-      return [
-        {
-          cornerRadius: getPadCornerRadius(element, width, height),
-          height,
-          hole: getPlatedHoleGeometry(element),
-          id: String(element.pcb_plated_hole_id ?? `pcb_plated_hole_${index + 1}`),
-          kind: 'plated-hole',
-          layer: Array.isArray(element.layers)
-            ? String(element.layers[0] ?? 'top')
-            : 'top',
-          portHints: Array.isArray(element.port_hints)
-            ? element.port_hints.map((hint) => normalizePortHint(String(hint)))
-            : [],
-          rotation,
-          shape,
-          width,
-          x: toNumber(element.x),
-          y: toNumber(element.y),
-        },
-      ]
-    }
-
-    return []
-  })
-
 export const buildFootprinterPreview = (
   footprinterString: string,
 ): FootprintPreview => {
@@ -351,34 +157,18 @@ export const buildFootprinterPreview = (
     })
   }
 
-  let circuitJson: CircuitElement[]
-
   try {
-    circuitJson = fp.string(normalizedString).circuitJson() as CircuitElement[]
+    return {
+      ...footprinterStringToPreview(normalizedString),
+      subtitle: 'Validated directly by @tscircuit/footprinter',
+    }
   } catch (error) {
     throw createFootprinterBuildError(normalizedString, error)
-  }
-
-  const pads = extractPads(circuitJson)
-
-  if (!pads.length) {
-    throw new PreviewBuildError({
-      code: 'FOOTPRINTER_NO_PADS',
-      field: 'footprinterString',
-      hint: 'Use a footprinter string that generates actual PCB pads.',
-      message: `Footprinter built "${normalizedString}" but it did not produce any PCB pads.`,
-    })
-  }
-
-  return {
-    pads,
-    subtitle: 'Validated directly by @tscircuit/footprinter',
-    title: normalizedString,
   }
 }
 
 export interface JlcpcbFootprint {
-  circuitJson: AnyCircuitElement[]
+  circuitJson: ReturnType<typeof convertEasyEdaJsonToCircuitJson>
   preview: FootprintPreview
 }
 
@@ -441,9 +231,16 @@ export const buildJlcpcbFootprint = async (
     })
   }
 
-  const circuitJson = convertEasyEdaJsonToCircuitJson(parsedComponent) as CircuitElement[]
-  const pads = extractPads(circuitJson)
-  if (!pads.length) {
+  const circuitJson = convertEasyEdaJsonToCircuitJson(parsedComponent)
+  let preview: FootprintPreview
+
+  try {
+    preview = circuitJsonToPreview(circuitJson, {
+      sourceHints: collectJlcSourceHints(rawComponent),
+      subtitle: parsedComponent.title ?? 'Validated directly by EasyEDA',
+      title: parsedComponent.lcsc.number,
+    })
+  } catch {
     throw new PreviewBuildError({
       code: 'JLCPCB_NO_PADS',
       field: 'jlcpcbPartNumber',
@@ -453,15 +250,7 @@ export const buildJlcpcbFootprint = async (
     })
   }
 
-  return {
-    circuitJson,
-    preview: {
-      pads,
-      sourceHints: collectJlcSourceHints(rawComponent),
-      subtitle: parsedComponent.title ?? 'Validated directly by EasyEDA',
-      title: parsedComponent.lcsc.number,
-    },
-  }
+  return { circuitJson, preview }
 }
 
 export const buildJlcpcbPreview = async (

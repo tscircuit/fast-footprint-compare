@@ -1,10 +1,12 @@
 import { z } from 'zod'
-import { summarizeCopperComparison } from './copperComparison.js'
+import {
+  summarizeCopperComparison,
+  type FootprintPreview,
+} from 'circuit-json-to-footprinter/compare'
 import {
   buildFootprinterPreview,
   buildJlcpcbPreview,
   PreviewBuildError,
-  type FootprintPreview,
   type InputField,
 } from './footprints.js'
 

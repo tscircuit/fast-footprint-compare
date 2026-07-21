@@ -2,13 +2,15 @@ import {
   circuitJsonToFootprinter,
   type FootprinterDiscoveryCandidate,
 } from 'circuit-json-to-footprinter'
+import {
+  summarizeCopperComparison,
+  type FootprintPreview,
+} from 'circuit-json-to-footprinter/compare'
 import { z } from 'zod'
-import { summarizeCopperComparison } from './copperComparison.js'
 import {
   buildFootprinterPreview,
   buildJlcpcbFootprint,
   PreviewBuildError,
-  type FootprintPreview,
 } from './footprints.js'
 
 const discoverRequestSchema = z.object({
@@ -122,6 +124,7 @@ export const handleDiscoverRequest = async (
     const best = {
       ...discovery.best,
       copperIntersectionOverUnion,
+      holeIntersectionOverUnion,
     }
 
     return {

@@ -35,7 +35,8 @@ ranked strings remain available for review.
 
 - React + Vite for the UI
 - small Express API for `footprinter` and `easyeda` adapters
-- `@tscircuit/footprinter` for left-side geometry
+- `circuit-json-to-footprinter` for footprint generation, shared shape geometry,
+  and copper/hole comparison
 - `easyeda` for JLCPCB footprint lookup and conversion
 
 ## Validation rules

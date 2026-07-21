@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { getFootprintBounds } from '../lib/footprintMath'
+import { getFootprintBounds } from 'circuit-json-to-footprinter/compare'
 import type { FootprintPreview, PreviewPad } from '../lib/types'
 
 interface LayerConfig {
