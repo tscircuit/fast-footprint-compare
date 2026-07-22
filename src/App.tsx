@@ -635,19 +635,22 @@ function App() {
                 </article>
               </section>
 
-              <section className="mt-6 grid gap-4 xl:grid-cols-2">
-                <article className={`${secondarySurfaceClass} p-5`}>
-                  <header className="flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
+              <section className="mt-6 grid min-w-0 gap-4 xl:grid-cols-2">
+                <article className={`${secondarySurfaceClass} flex min-w-0 flex-col p-5`}>
+                  <header className="flex min-w-0 flex-1 flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1">
                       <div className={sectionLabelClass}>Footprinter Preview</div>
-                      <h2 className="mt-1 text-xl font-semibold text-slate-950">
+                      <h2 className="mt-1 [overflow-wrap:anywhere] text-xl font-semibold text-slate-950">
                         {compareResponse.left.title}
                       </h2>
-                      <p className="mt-1 text-sm text-slate-500">
+                      <p className="mt-1 [overflow-wrap:anywhere] text-sm text-slate-500">
                         {compareResponse.left.subtitle}
                       </p>
                     </div>
-                    <code className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+                    <code
+                      className="block max-w-full truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 sm:max-w-[45%] sm:shrink-0"
+                      title={footprinterString}
+                    >
                       {footprinterString}
                     </code>
                   </header>
@@ -665,18 +668,21 @@ function App() {
                   </div>
                 </article>
 
-                <article className={`${secondarySurfaceClass} p-5`}>
-                  <header className="flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
+                <article className={`${secondarySurfaceClass} flex min-w-0 flex-col p-5`}>
+                  <header className="flex min-w-0 flex-1 flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1">
                       <div className={sectionLabelClass}>JLCPCB Preview</div>
-                      <h2 className="mt-1 text-xl font-semibold text-slate-950">
+                      <h2 className="mt-1 [overflow-wrap:anywhere] text-xl font-semibold text-slate-950">
                         {compareResponse.right.title}
                       </h2>
-                      <p className="mt-1 text-sm text-slate-500">
+                      <p className="mt-1 [overflow-wrap:anywhere] text-sm text-slate-500">
                         {compareResponse.right.subtitle}
                       </p>
                     </div>
-                    <code className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+                    <code
+                      className="block max-w-full truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 sm:max-w-[45%] sm:shrink-0"
+                      title={jlcpcbPartNumber}
+                    >
                       {jlcpcbPartNumber}
                     </code>
                   </header>
