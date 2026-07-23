@@ -35,6 +35,22 @@ const padElement = (pad: PreviewPad, accent: string, fillOpacity: number) => {
     )
   }
 
+  if (pad.shape === 'polygon' && pad.points?.length) {
+    return (
+      <polygon
+        {...commonProps}
+        points={pad.points
+          .map((point) => `${pad.x + point.x},${-(pad.y + point.y)}`)
+          .join(' ')}
+        transform={
+          pad.rotation
+            ? `rotate(${-pad.rotation} ${pad.x} ${-pad.y})`
+            : undefined
+        }
+      />
+    )
+  }
+
   const cornerRadius =
     pad.shape === 'pill'
       ? Math.min(pad.width, pad.height) / 2
