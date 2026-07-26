@@ -1,7 +1,7 @@
 import {
-  circuitJsonToPreview,
-  footprinterStringToPreview,
-  type FootprintPreview,
+  circuitJsonToFootprint,
+  footprinterStringToFootprint,
+  type Footprint,
 } from 'circuit-json-to-footprinter'
 import {
   EasyEdaJsonSchema,
@@ -9,7 +9,7 @@ import {
   fetchEasyEDAComponent,
 } from 'easyeda'
 
-export type { FootprintPreview } from 'circuit-json-to-footprinter'
+export type { Footprint } from 'circuit-json-to-footprinter'
 export type InputField = 'footprinterString' | 'jlcpcbPartNumber'
 
 const directJlcPartNumberPattern = /^C(\d+)$/i
@@ -99,9 +99,9 @@ const createFootprinterBuildError = (
   error: unknown,
 ): PreviewBuildError => {
   const message = getErrorMessage(error).trim()
-  const hasNoPads = message.includes(
-    'must contain at least one PCB SMT pad or plated hole',
-  )
+  const hasNoPads =
+    message.includes('must contain at least one PCB SMT pad or plated hole') ||
+    message.includes('must contain at least one PcbSmtPad or PcbPlatedHole')
 
   return new PreviewBuildError({
     code: hasNoPads
@@ -146,7 +146,7 @@ const normalizeJlcpcbPartNumber = (jlcpcbPartNumber: string) => {
 
 export const buildFootprinterPreview = (
   footprinterString: string,
-): FootprintPreview => {
+): Footprint => {
   const normalizedString = footprinterString.trim()
   if (!normalizedString) {
     throw new PreviewBuildError({
@@ -159,7 +159,7 @@ export const buildFootprinterPreview = (
 
   try {
     return {
-      ...footprinterStringToPreview(normalizedString),
+      ...footprinterStringToFootprint(normalizedString),
       subtitle: 'Validated directly by @tscircuit/footprinter',
     }
   } catch (error) {
@@ -169,7 +169,7 @@ export const buildFootprinterPreview = (
 
 export interface JlcpcbFootprint {
   circuitJson: ReturnType<typeof convertEasyEdaJsonToCircuitJson>
-  preview: FootprintPreview
+  preview: Footprint
 }
 
 export const buildJlcpcbFootprint = async (
@@ -232,10 +232,10 @@ export const buildJlcpcbFootprint = async (
   }
 
   const circuitJson = convertEasyEdaJsonToCircuitJson(parsedComponent)
-  let preview: FootprintPreview
+  let preview: Footprint
 
   try {
-    preview = circuitJsonToPreview(circuitJson, {
+    preview = circuitJsonToFootprint(circuitJson, {
       sourceHints: collectJlcSourceHints(rawComponent),
       subtitle: parsedComponent.title ?? 'Validated directly by EasyEDA',
       title: parsedComponent.lcsc.number,
@@ -255,5 +255,5 @@ export const buildJlcpcbFootprint = async (
 
 export const buildJlcpcbPreview = async (
   jlcpcbPartNumber: string,
-): Promise<FootprintPreview> =>
+): Promise<Footprint> =>
   (await buildJlcpcbFootprint(jlcpcbPartNumber)).preview

@@ -4,7 +4,7 @@ import {
 } from 'circuit-json-to-footprinter'
 import {
   summarizeCopperComparison,
-  type FootprintPreview,
+  type Footprint,
 } from 'circuit-json-to-footprinter/compare'
 import { z } from 'zod'
 import {
@@ -31,8 +31,8 @@ export interface DiscoverResponse {
   comparison: {
     copperIntersectionOverUnion: number
     holeIntersectionOverUnion: number
-    left: FootprintPreview
-    right: FootprintPreview
+    left: Footprint
+    right: Footprint
   }
   diagnostics: {
     evaluatedSeeds: number

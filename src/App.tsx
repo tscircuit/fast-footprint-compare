@@ -71,8 +71,14 @@ function App() {
     return compareFootprints(compareResponse.left, compareResponse.right)
   }, [compareResponse])
   const hasComparedHoles = Boolean(
-    compareResponse?.left.pads.some((pad) => pad.hole) ||
-      compareResponse?.right.pads.some((pad) => pad.hole),
+    compareResponse?.left.holes.length ||
+      compareResponse?.left.pads.some(
+        (pad) => pad.type === 'pcb_plated_hole',
+      ) ||
+      compareResponse?.right.holes.length ||
+      compareResponse?.right.pads.some(
+        (pad) => pad.type === 'pcb_plated_hole',
+      ),
   )
 
   const hasLiveComparison =

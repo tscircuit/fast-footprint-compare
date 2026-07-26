@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import {
   summarizeCopperComparison,
-  type FootprintPreview,
+  type Footprint,
 } from 'circuit-json-to-footprinter/compare'
 import {
   buildFootprinterPreview,
@@ -15,8 +15,8 @@ const directJlcPartNumberPattern = /^C\d+$/i
 export interface CompareResponse {
   copperIntersectionOverUnion: number
   holeIntersectionOverUnion: number
-  left: FootprintPreview
-  right: FootprintPreview
+  left: Footprint
+  right: Footprint
 }
 
 export interface CompareErrorPayload {

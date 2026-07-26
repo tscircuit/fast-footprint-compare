@@ -1,22 +1,16 @@
 import type {
-  Bounds,
-  FootprintPreview,
   FootprinterDiscoveryCandidate,
-  PreviewHole,
-  PreviewPad,
-  PreviewPadKind,
-  PreviewPadShape,
-  RasterComparison,
 } from 'circuit-json-to-footprinter'
+import type {
+  Bounds,
+  Footprint,
+  RasterComparison,
+} from 'circuit-json-to-footprinter/compare'
 
 export type {
   Bounds,
-  FootprintPreview,
+  Footprint,
   FootprinterDiscoveryCandidate,
-  PreviewHole,
-  PreviewPad,
-  PreviewPadKind,
-  PreviewPadShape,
   RasterComparison,
 }
 
@@ -25,8 +19,8 @@ export type InputField = 'footprinterString' | 'jlcpcbPartNumber'
 export interface CompareResponse {
   copperIntersectionOverUnion: number
   holeIntersectionOverUnion: number
-  left: FootprintPreview
-  right: FootprintPreview
+  left: Footprint
+  right: Footprint
 }
 
 export interface DiscoverResponse {
