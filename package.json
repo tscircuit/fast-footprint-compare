@@ -11,10 +11,10 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json && tsc --noEmit -p tsconfig.node.json"
   },
   "dependencies": {
-    "@tscircuit/footprinter": "^0.0.403",
+    "@tscircuit/footprinter": "^0.0.405",
     "@tscircuit/math-utils": "^0.0.36",
     "circuit-json": "^0.0.453",
-    "circuit-json-to-footprinter": "^0.0.34",
+    "circuit-json-to-footprinter": "^0.0.35",
     "easyeda": "^0.0.271",
     "express": "^5.2.1",
     "react": "^19.2.7",
