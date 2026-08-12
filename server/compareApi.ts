@@ -9,10 +9,14 @@ import {
   PreviewBuildError,
   type InputField,
 } from './footprints.js'
+import {
+  getPinComparison,
+  type PinComparisonSummary,
+} from './pinComparison.js'
 
 const directJlcPartNumberPattern = /^C\d+$/i
 
-export interface CompareResponse {
+export interface CompareResponse extends PinComparisonSummary {
   copperIntersectionOverUnion: number
   holeIntersectionOverUnion: number
   left: Footprint
@@ -156,6 +160,7 @@ export const handleCompareRequest = async (
       buildJlcpcbPreview(parsed.data.jlcpcbPartNumber),
     ])
     const copperComparison = summarizeCopperComparison(left, right)
+    const pinComparison = getPinComparison(copperComparison, left, right)
 
     return {
       body: {
@@ -164,6 +169,7 @@ export const handleCompareRequest = async (
         holeIntersectionOverUnion:
           copperComparison.holeIntersectionOverUnion,
         left,
+        ...pinComparison,
         right,
       },
       status: 200,

@@ -16,7 +16,25 @@ export type {
 
 export type InputField = 'footprinterString' | 'jlcpcbPartNumber'
 
-export interface CompareResponse {
+export interface PinMismatchDetail {
+  leftPadIndex: number | null
+  leftPinNumbers: number[]
+  leftPortHints: string[]
+  rightPadIndex: number | null
+  rightPinNumbers: number[]
+  rightPortHints: string[]
+}
+
+export interface PinComparisonSummary {
+  pinMatchRate: number
+  pinMismatches: PinMismatchDetail[]
+  pinsMatch: boolean
+}
+
+export type PinAwareFootprinterDiscoveryCandidate =
+  FootprinterDiscoveryCandidate & PinComparisonSummary
+
+export interface CompareResponse extends PinComparisonSummary {
   copperIntersectionOverUnion: number
   holeIntersectionOverUnion: number
   left: Footprint
@@ -24,8 +42,8 @@ export interface CompareResponse {
 }
 
 export interface DiscoverResponse {
-  best: FootprinterDiscoveryCandidate
-  candidates: FootprinterDiscoveryCandidate[]
+  best: PinAwareFootprinterDiscoveryCandidate
+  candidates: PinAwareFootprinterDiscoveryCandidate[]
   comparison: CompareResponse
   diagnostics: {
     evaluatedSeeds: number

@@ -11,6 +11,7 @@ footprint for an exact JLCPCB part number.
 - right side preview for a JLCPCB part number
 - aligned overlay preview
 - separate copper and drilled-hole IoU scores
+- numeric pin match rate with position-level mismatch details
 - heatmap showing overlap, footprinter-only, and JLC-only geometry
 - matched pin metrics for center, size, and rotation deltas
 - automatic discovery of ranked footprinter strings from a JLCPCB part number

@@ -12,6 +12,15 @@ import {
   buildJlcpcbFootprint,
   PreviewBuildError,
 } from './footprints.js'
+import {
+  getPinComparison,
+  type PinComparisonSummary,
+} from './pinComparison.js'
+
+const PIN_MISMATCH_RANKING_WEIGHT = 0.01
+
+type PinAwareDiscoveryCandidate = FootprinterDiscoveryCandidate &
+  PinComparisonSummary
 
 const discoverRequestSchema = z.object({
   jlcpcbPartNumber: z
@@ -26,9 +35,9 @@ const discoverRequestSchema = z.object({
 })
 
 export interface DiscoverResponse {
-  best: FootprinterDiscoveryCandidate
-  candidates: FootprinterDiscoveryCandidate[]
-  comparison: {
+  best: PinAwareDiscoveryCandidate
+  candidates: PinAwareDiscoveryCandidate[]
+  comparison: PinComparisonSummary & {
     copperIntersectionOverUnion: number
     holeIntersectionOverUnion: number
     left: Footprint
@@ -117,20 +126,61 @@ export const handleDiscoverRequest = async (
       }
     }
 
-    const left = buildFootprinterPreview(discovery.best.footprinterString)
+    const candidates = discovery.candidates
+      .map((candidate): PinAwareDiscoveryCandidate => {
+        const candidateFootprint = buildFootprinterPreview(
+          candidate.footprinterString,
+        )
+        const candidateComparison = summarizeCopperComparison(
+          candidateFootprint,
+          target,
+        )
+        const pinComparison = getPinComparison(
+          candidateComparison,
+          candidateFootprint,
+          target,
+        )
+        const packageAlreadyRankedPins =
+          'pinMatchRate' in candidate &&
+          typeof candidate.pinMatchRate === 'number'
+
+        return {
+          ...candidate,
+          ...pinComparison,
+          rankingScore:
+            candidate.rankingScore +
+            (packageAlreadyRankedPins
+              ? 0
+              : (pinComparison.pinMatchRate - 1) *
+                PIN_MISMATCH_RANKING_WEIGHT),
+        }
+      })
+      .sort(
+        (leftCandidate, rightCandidate) =>
+          rightCandidate.rankingScore - leftCandidate.rankingScore ||
+          rightCandidate.pinMatchRate - leftCandidate.pinMatchRate,
+      )
+    const bestCandidate = candidates[0]
+    if (!bestCandidate) {
+      throw new Error('Discovery returned no ranked candidates.')
+    }
+
+    const left = buildFootprinterPreview(bestCandidate.footprinterString)
     const comparison = summarizeCopperComparison(left, target)
     const { copperIntersectionOverUnion, holeIntersectionOverUnion } =
       comparison
+    const pinComparison = getPinComparison(comparison, left, target)
     const best = {
-      ...discovery.best,
+      ...bestCandidate,
       copperIntersectionOverUnion,
       holeIntersectionOverUnion,
+      ...pinComparison,
     }
 
     return {
       body: {
         best,
-        candidates: discovery.candidates.map((candidate) =>
+        candidates: candidates.map((candidate) =>
           candidate.footprinterString === best.footprinterString
             ? best
             : candidate,
@@ -139,6 +189,7 @@ export const handleDiscoverRequest = async (
           copperIntersectionOverUnion,
           holeIntersectionOverUnion,
           left,
+          ...pinComparison,
           right: target,
         },
         diagnostics: discovery.diagnostics,
