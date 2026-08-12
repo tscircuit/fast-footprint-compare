@@ -3,6 +3,7 @@ import { compareFootprints } from 'circuit-json-to-footprinter/compare'
 import { DiffHeatmap } from './components/DiffHeatmap'
 import { FootprintSvg } from './components/FootprintSvg'
 import { formatPercent } from './lib/formatPercent'
+import { hasDrilledGeometry } from './lib/hasDrilledGeometry'
 import type {
   ApiErrorResponse,
   ApiErrorPayload,
@@ -71,14 +72,9 @@ function App() {
     return compareFootprints(compareResponse.left, compareResponse.right)
   }, [compareResponse])
   const hasComparedHoles = Boolean(
-    compareResponse?.left.holes.length ||
-      compareResponse?.left.pads.some(
-        (pad) => pad.type === 'pcb_plated_hole',
-      ) ||
-      compareResponse?.right.holes.length ||
-      compareResponse?.right.pads.some(
-        (pad) => pad.type === 'pcb_plated_hole',
-      ),
+    compareResponse &&
+      (hasDrilledGeometry(compareResponse.left) ||
+        hasDrilledGeometry(compareResponse.right)),
   )
 
   const hasLiveComparison =
@@ -576,8 +572,8 @@ function App() {
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-600">
                     {hasComparedHoles
-                      ? 'Drill and slot overlap returned as `holeIntersectionOverUnion`.'
-                      : 'Neither footprint contains drilled holes.'}
+                      ? 'Drill, slot, and via overlap returned as `holeIntersectionOverUnion`.'
+                      : 'Neither footprint contains drilled geometry.'}
                   </p>
                 </article>
 
