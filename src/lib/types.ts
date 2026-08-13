@@ -3,22 +3,24 @@ import type {
 } from 'circuit-json-to-footprinter'
 import type {
   Bounds,
+  CopperComparisonSummary,
   Footprint,
+  PinMismatchDetail,
   RasterComparison,
 } from 'circuit-json-to-footprinter/compare'
 
 export type {
   Bounds,
+  CopperComparisonSummary,
   Footprint,
   FootprinterDiscoveryCandidate,
+  PinMismatchDetail,
   RasterComparison,
 }
 
 export type InputField = 'footprinterString' | 'jlcpcbPartNumber'
 
-export interface CompareResponse {
-  copperIntersectionOverUnion: number
-  holeIntersectionOverUnion: number
+export interface CompareResponse extends CopperComparisonSummary {
   left: Footprint
   right: Footprint
 }

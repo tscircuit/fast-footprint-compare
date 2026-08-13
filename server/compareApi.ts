@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import {
   summarizeCopperComparison,
+  type CopperComparisonSummary,
   type Footprint,
 } from 'circuit-json-to-footprinter/compare'
 import {
@@ -9,12 +10,9 @@ import {
   PreviewBuildError,
   type InputField,
 } from './footprints.js'
-
 const directJlcPartNumberPattern = /^C\d+$/i
 
-export interface CompareResponse {
-  copperIntersectionOverUnion: number
-  holeIntersectionOverUnion: number
+export interface CompareResponse extends CopperComparisonSummary {
   left: Footprint
   right: Footprint
 }
@@ -159,10 +157,7 @@ export const handleCompareRequest = async (
 
     return {
       body: {
-        copperIntersectionOverUnion:
-          copperComparison.copperIntersectionOverUnion,
-        holeIntersectionOverUnion:
-          copperComparison.holeIntersectionOverUnion,
+        ...copperComparison,
         left,
         right,
       },
