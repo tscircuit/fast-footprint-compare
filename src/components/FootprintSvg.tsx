@@ -10,6 +10,7 @@ import type {
   PcbHole,
   PcbPlatedHole,
   PcbSmtPad,
+  PcbVia,
   Point,
 } from 'circuit-json'
 import type { Footprint } from '../lib/types'
@@ -382,6 +383,24 @@ const holeElement = (hole: PcbHole, style: ShapeStyle) => {
   }
 }
 
+const viaCopperElement = (via: PcbVia, style: ShapeStyle) =>
+  ellipseElement({
+    height: via.outer_diameter,
+    style,
+    width: via.outer_diameter,
+    x: via.x,
+    y: via.y,
+  })
+
+const viaDrillElement = (via: PcbVia, style: ShapeStyle) =>
+  ellipseElement({
+    height: via.hole_diameter,
+    style: { ...style, hole: true },
+    width: via.hole_diameter,
+    x: via.x,
+    y: via.y,
+  })
+
 const getRequiredBounds = (points: readonly Point[]): Bounds => {
   const bounds = getBoundsFromPoints([...points])
   if (!bounds) throw new Error('Cannot calculate bounds without points')
@@ -483,6 +502,9 @@ const getHoleBounds = (hole: PcbHole) => {
   }
 }
 
+const getViaBounds = (via: PcbVia) =>
+  getRectBounds(via.x, via.y, via.outer_diameter, via.outer_diameter)
+
 const mergeBounds = (bounds: readonly Bounds[]): Bounds =>
   getRequiredBounds(
     bounds.flatMap((bound) => [
@@ -516,6 +538,7 @@ const getLayerBounds = (footprint: Footprint) =>
     mergeBounds([
       getFootprintBounds(footprint.pads),
       ...footprint.holes.map(getHoleBounds),
+      ...footprint.vias.map(getViaBounds),
     ]),
     footprint,
   )
@@ -655,6 +678,16 @@ export function FootprintSvg({
                 {layer.footprint.holes.map((hole, holeIndex) => (
                   <g key={hole.pcb_hole_id || `hole-${holeIndex}`}>
                     {holeElement(hole, style)}
+                  </g>
+                ))}
+                {layer.footprint.vias.map((via, viaIndex) => (
+                  <g
+                    data-element-type="pcb_via"
+                    data-pcb-via-id={via.pcb_via_id}
+                    key={via.pcb_via_id || `via-${viaIndex}`}
+                  >
+                    {viaCopperElement(via, style)}
+                    {viaDrillElement(via, style)}
                   </g>
                 ))}
               </g>

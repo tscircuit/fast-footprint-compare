@@ -23,6 +23,7 @@ test('renders polygon pads from their vertices', () => {
     ],
     subtitle: 'Polygon preview',
     title: 'Polygon',
+    vias: [],
   }
 
   const markup = renderToStaticMarkup(
@@ -86,6 +87,7 @@ test('renders rotated plated-hole copper and drill independently', () => {
     ],
     subtitle: 'Rotated plated hole',
     title: 'Rotated plated hole',
+    vias: [],
   }
   const markup = renderToStaticMarkup(
     <FootprintSvg
@@ -102,4 +104,54 @@ test('renders rotated plated-hole copper and drill independently', () => {
 
   expect(markup).toContain('rotate(-30 0 0)')
   expect(markup).toContain('rotate(-45 0 0)')
+})
+
+test('renders PCB via copper and drill independently', () => {
+  const footprint: Footprint = {
+    holes: [],
+    pads: [
+      {
+        height: 2,
+        layer: 'top',
+        pcb_smtpad_id: 'thermal-pad',
+        shape: 'rect',
+        type: 'pcb_smtpad',
+        width: 2,
+        x: 0,
+        y: 0,
+      },
+    ],
+    subtitle: 'Thermal via preview',
+    title: 'Thermal via',
+    vias: [
+      {
+        hole_diameter: 0.3,
+        layers: ['top', 'bottom'],
+        outer_diameter: 0.8,
+        pcb_via_id: 'thermal-via-1',
+        type: 'pcb_via',
+        x: 0,
+        y: 0,
+      },
+    ],
+  }
+  const markup = renderToStaticMarkup(
+    <FootprintSvg
+      layers={[
+        {
+          accent: '#06b6d4',
+          fillOpacity: 0.76,
+          footprint,
+          label: 'JLCPCB',
+        },
+      ]}
+      showLabels={false}
+    />,
+  )
+
+  expect(markup).toContain('data-element-type="pcb_via"')
+  expect(markup).toContain('data-pcb-via-id="thermal-via-1"')
+  expect(markup).toContain('rx="0.4"')
+  expect(markup).toContain('rx="0.15"')
+  expect(markup).toContain('fill="#020617"')
 })
