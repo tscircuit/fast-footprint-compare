@@ -588,41 +588,40 @@ function App() {
 
           {hasLiveComparison && compareResponse && comparison ? (
             <>
-              <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-                <article className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+              <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <article className="min-w-0 rounded-2xl border border-blue-100 bg-blue-50 p-5">
                   <div className={sectionLabelClass}>Copper IoU</div>
-                  <div className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">
+                  <div className="mt-3 whitespace-nowrap text-4xl font-semibold tracking-tight text-slate-950">
                     {formatPercent(compareResponse.copperIntersectionOverUnion)}
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-600">
-                    Returned directly by the comparison API as
-                    `copperIntersectionOverUnion`.
+                    Shared copper area across both aligned footprints.
                   </p>
                 </article>
 
-                <article className="rounded-2xl border border-violet-100 bg-violet-50 p-5">
+                <article className="min-w-0 rounded-2xl border border-violet-100 bg-violet-50 p-5">
                   <div className={sectionLabelClass}>Hole IoU</div>
-                  <div className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">
+                  <div className="mt-3 whitespace-nowrap text-4xl font-semibold tracking-tight text-slate-950">
                     {hasComparedHoles
                       ? formatPercent(compareResponse.holeIntersectionOverUnion)
                       : 'N/A'}
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-600">
                     {hasComparedHoles
-                      ? 'Drill, slot, and via overlap returned as `holeIntersectionOverUnion`.'
+                      ? 'Shared drilled geometry across both aligned footprints.'
                       : 'Neither footprint contains drilled geometry.'}
                   </p>
                 </article>
 
                 <article
-                  className={`rounded-2xl border p-5 ${
+                  className={`min-w-0 rounded-2xl border p-5 ${
                     compareResponse.pinsMatch
                       ? 'border-emerald-100 bg-emerald-50'
                       : 'border-amber-200 bg-amber-50'
                   }`}
                 >
                   <div className={sectionLabelClass}>Pin Match</div>
-                  <div className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">
+                  <div className="mt-3 whitespace-nowrap text-4xl font-semibold tracking-tight text-slate-950">
                     {formatPercent(compareResponse.pinMatchRate)}
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -630,24 +629,28 @@ function App() {
                       ? 'Numeric pin assignments match at every position.'
                       : `${compareResponse.pinMismatches.length} position${
                           compareResponse.pinMismatches.length === 1 ? '' : 's'
-                        } have different numeric pin assignments.`}
+                        } ${
+                          compareResponse.pinMismatches.length === 1
+                            ? 'has'
+                            : 'have'
+                        } different numeric pin assignments.`}
                   </p>
                 </article>
 
-                <article className={`${secondarySurfaceClass} p-5`}>
+                <article className={`${secondarySurfaceClass} min-w-0 p-5`}>
                   <div className={sectionLabelClass}>Coverage</div>
                   <div className="mt-4 space-y-3">
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-sm text-slate-600">
                         Footprinter covered
                       </span>
-                      <span className="text-2xl font-semibold tracking-tight text-slate-950">
+                      <span className="whitespace-nowrap text-2xl font-semibold tracking-tight text-slate-950">
                         {formatPercent(comparison.coverageLeft)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-sm text-slate-600">JLCPCB covered</span>
-                      <span className="text-2xl font-semibold tracking-tight text-slate-950">
+                      <span className="whitespace-nowrap text-2xl font-semibold tracking-tight text-slate-950">
                         {formatPercent(comparison.coverageRight)}
                       </span>
                     </div>
@@ -657,9 +660,9 @@ function App() {
                   </p>
                 </article>
 
-                <article className={`${secondarySurfaceClass} p-5`}>
+                <article className={`${secondarySurfaceClass} min-w-0 p-5`}>
                   <div className={sectionLabelClass}>Pad Count</div>
-                  <div className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                  <div className="mt-3 whitespace-nowrap text-3xl font-semibold tracking-tight text-slate-950">
                     {compareResponse.left.pads.length} vs{' '}
                     {compareResponse.right.pads.length}
                   </div>
@@ -670,20 +673,20 @@ function App() {
                   </p>
                 </article>
 
-                <article className={`${secondarySurfaceClass} p-5`}>
+                <article className={`${secondarySurfaceClass} min-w-0 p-5`}>
                   <div className={sectionLabelClass}>Mismatch Split</div>
                   <div className="mt-4 space-y-3">
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-sm text-slate-600">
                         Footprinter only
                       </span>
-                      <span className="text-2xl font-semibold tracking-tight text-slate-950">
+                      <span className="whitespace-nowrap text-2xl font-semibold tracking-tight text-slate-950">
                         {formatPercent(comparison.leftOnlyRatio)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-sm text-slate-600">JLCPCB only</span>
-                      <span className="text-2xl font-semibold tracking-tight text-slate-950">
+                      <span className="whitespace-nowrap text-2xl font-semibold tracking-tight text-slate-950">
                         {formatPercent(comparison.rightOnlyRatio)}
                       </span>
                     </div>
@@ -715,7 +718,7 @@ function App() {
 
               <section className="mt-6 grid min-w-0 gap-4 xl:grid-cols-2">
                 <article className={`${secondarySurfaceClass} flex min-w-0 flex-col p-5`}>
-                  <header className="flex min-w-0 flex-1 flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                  <header className="min-w-0 flex-1 border-b border-slate-200 pb-4">
                     <div className="min-w-0 flex-1">
                       <div className={sectionLabelClass}>Footprinter Preview</div>
                       <h2 className="mt-1 [overflow-wrap:anywhere] text-xl font-semibold text-slate-950">
@@ -725,12 +728,6 @@ function App() {
                         {compareResponse.left.subtitle}
                       </p>
                     </div>
-                    <code
-                      className="block max-w-full truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 sm:max-w-[45%] sm:shrink-0"
-                      title={footprinterString}
-                    >
-                      {footprinterString}
-                    </code>
                   </header>
                   <div className="mt-4">
                     <FootprintSvg
@@ -747,7 +744,7 @@ function App() {
                 </article>
 
                 <article className={`${secondarySurfaceClass} flex min-w-0 flex-col p-5`}>
-                  <header className="flex min-w-0 flex-1 flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                  <header className="min-w-0 flex-1 border-b border-slate-200 pb-4">
                     <div className="min-w-0 flex-1">
                       <div className={sectionLabelClass}>JLCPCB Preview</div>
                       <h2 className="mt-1 [overflow-wrap:anywhere] text-xl font-semibold text-slate-950">
@@ -757,12 +754,6 @@ function App() {
                         {compareResponse.right.subtitle}
                       </p>
                     </div>
-                    <code
-                      className="block max-w-full truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 sm:max-w-[45%] sm:shrink-0"
-                      title={jlcpcbPartNumber}
-                    >
-                      {jlcpcbPartNumber}
-                    </code>
                   </header>
                   <div className="mt-4">
                     <FootprintSvg
