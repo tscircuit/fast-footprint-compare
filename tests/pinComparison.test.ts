@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import type { Footprint } from 'circuit-json-to-footprinter/compare'
-import { comparePinHints } from '../server/pinComparison.js'
+import { summarizeCopperComparison } from 'circuit-json-to-footprinter/compare'
 
 const footprint = (leftPin: number, rightPin: number): Footprint => ({
   holes: [],
@@ -30,11 +30,16 @@ const footprint = (leftPin: number, rightPin: number): Footprint => ({
   ],
   subtitle: '',
   title: '',
+  vias: [],
 })
 
-test('reports position-matched numeric pin swaps', () => {
-  const comparison = comparePinHints(footprint(1, 2), footprint(2, 1))
+test('shared comparison reports position-matched numeric pin swaps', () => {
+  const comparison = summarizeCopperComparison(
+    footprint(1, 2),
+    footprint(2, 1),
+  )
 
+  expect(comparison.copperIntersectionOverUnion).toBe(1)
   expect(comparison.pinMatchRate).toBe(0)
   expect(comparison.pinsMatch).toBe(false)
   expect(comparison.pinMismatches).toEqual([
@@ -57,7 +62,7 @@ test('reports position-matched numeric pin swaps', () => {
   ])
 })
 
-test('reports non-numeric thermal pad against numeric pin 17', () => {
+test('shared comparison reports non-numeric thermal pad against numeric pin 17', () => {
   const left = footprint(1, 2)
   const right = footprint(1, 2)
   left.pads.push({
@@ -83,7 +88,7 @@ test('reports non-numeric thermal pad against numeric pin 17', () => {
     y: 0,
   })
 
-  expect(comparePinHints(left, right)).toMatchObject({
+  expect(summarizeCopperComparison(left, right)).toMatchObject({
     pinMatchRate: 2 / 3,
     pinsMatch: false,
     pinMismatches: [

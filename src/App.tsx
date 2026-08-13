@@ -8,8 +8,8 @@ import type {
   ApiErrorPayload,
   CompareResponse,
   DiscoverResponse,
+  FootprinterDiscoveryCandidate,
   InputField,
-  PinAwareFootprinterDiscoveryCandidate,
   PinMismatchDetail,
 } from './lib/types'
 
@@ -83,7 +83,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [isDiscovering, setIsDiscovering] = useState(false)
   const [discoveryCandidates, setDiscoveryCandidates] = useState<
-    PinAwareFootprinterDiscoveryCandidate[]
+    FootprinterDiscoveryCandidate[]
   >([])
   const [discoveryDiagnostics, setDiscoveryDiagnostics] = useState<
     DiscoverResponse['diagnostics'] | null

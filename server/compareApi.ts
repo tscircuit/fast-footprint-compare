@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import {
   summarizeCopperComparison,
+  type CopperComparisonSummary,
   type Footprint,
 } from 'circuit-json-to-footprinter/compare'
 import {
@@ -9,16 +10,9 @@ import {
   PreviewBuildError,
   type InputField,
 } from './footprints.js'
-import {
-  getPinComparison,
-  type PinComparisonSummary,
-} from './pinComparison.js'
-
 const directJlcPartNumberPattern = /^C\d+$/i
 
-export interface CompareResponse extends PinComparisonSummary {
-  copperIntersectionOverUnion: number
-  holeIntersectionOverUnion: number
+export interface CompareResponse extends CopperComparisonSummary {
   left: Footprint
   right: Footprint
 }
@@ -160,16 +154,11 @@ export const handleCompareRequest = async (
       buildJlcpcbPreview(parsed.data.jlcpcbPartNumber),
     ])
     const copperComparison = summarizeCopperComparison(left, right)
-    const pinComparison = getPinComparison(copperComparison, left, right)
 
     return {
       body: {
-        copperIntersectionOverUnion:
-          copperComparison.copperIntersectionOverUnion,
-        holeIntersectionOverUnion:
-          copperComparison.holeIntersectionOverUnion,
+        ...copperComparison,
         left,
-        ...pinComparison,
         right,
       },
       status: 200,

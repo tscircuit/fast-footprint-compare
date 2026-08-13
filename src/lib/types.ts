@@ -3,47 +3,31 @@ import type {
 } from 'circuit-json-to-footprinter'
 import type {
   Bounds,
+  CopperComparisonSummary,
   Footprint,
+  PinMismatchDetail,
   RasterComparison,
 } from 'circuit-json-to-footprinter/compare'
 
 export type {
   Bounds,
+  CopperComparisonSummary,
   Footprint,
   FootprinterDiscoveryCandidate,
+  PinMismatchDetail,
   RasterComparison,
 }
 
 export type InputField = 'footprinterString' | 'jlcpcbPartNumber'
 
-export interface PinMismatchDetail {
-  leftPadIndex: number | null
-  leftPinNumbers: number[]
-  leftPortHints: string[]
-  rightPadIndex: number | null
-  rightPinNumbers: number[]
-  rightPortHints: string[]
-}
-
-export interface PinComparisonSummary {
-  pinMatchRate: number
-  pinMismatches: PinMismatchDetail[]
-  pinsMatch: boolean
-}
-
-export type PinAwareFootprinterDiscoveryCandidate =
-  FootprinterDiscoveryCandidate & PinComparisonSummary
-
-export interface CompareResponse extends PinComparisonSummary {
-  copperIntersectionOverUnion: number
-  holeIntersectionOverUnion: number
+export interface CompareResponse extends CopperComparisonSummary {
   left: Footprint
   right: Footprint
 }
 
 export interface DiscoverResponse {
-  best: PinAwareFootprinterDiscoveryCandidate
-  candidates: PinAwareFootprinterDiscoveryCandidate[]
+  best: FootprinterDiscoveryCandidate
+  candidates: FootprinterDiscoveryCandidate[]
   comparison: CompareResponse
   diagnostics: {
     evaluatedSeeds: number
