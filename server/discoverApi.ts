@@ -4,6 +4,7 @@ import {
 } from 'circuit-json-to-footprinter'
 import {
   summarizeCopperComparison,
+  type CopperComparisonSummary,
   type Footprint,
 } from 'circuit-json-to-footprinter/compare'
 import { z } from 'zod'
@@ -12,7 +13,6 @@ import {
   buildJlcpcbFootprint,
   PreviewBuildError,
 } from './footprints.js'
-
 const discoverRequestSchema = z.object({
   jlcpcbPartNumber: z
     .string()
@@ -28,9 +28,7 @@ const discoverRequestSchema = z.object({
 export interface DiscoverResponse {
   best: FootprinterDiscoveryCandidate
   candidates: FootprinterDiscoveryCandidate[]
-  comparison: {
-    copperIntersectionOverUnion: number
-    holeIntersectionOverUnion: number
+  comparison: CopperComparisonSummary & {
     left: Footprint
     right: Footprint
   }
@@ -119,12 +117,9 @@ export const handleDiscoverRequest = async (
 
     const left = buildFootprinterPreview(discovery.best.footprinterString)
     const comparison = summarizeCopperComparison(left, target)
-    const { copperIntersectionOverUnion, holeIntersectionOverUnion } =
-      comparison
     const best = {
       ...discovery.best,
-      copperIntersectionOverUnion,
-      holeIntersectionOverUnion,
+      ...comparison,
     }
 
     return {
@@ -136,8 +131,7 @@ export const handleDiscoverRequest = async (
             : candidate,
         ),
         comparison: {
-          copperIntersectionOverUnion,
-          holeIntersectionOverUnion,
+          ...comparison,
           left,
           right: target,
         },

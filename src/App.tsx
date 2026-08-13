@@ -11,6 +11,7 @@ import type {
   DiscoverResponse,
   FootprinterDiscoveryCandidate,
   InputField,
+  PinMismatchDetail,
 } from './lib/types'
 
 const exampleInputs = {
@@ -26,6 +27,29 @@ const secondarySurfaceClass =
 const inputBaseClass =
   'rounded-xl border px-4 py-3 text-sm text-slate-900 outline-none transition focus:ring-2'
 const directJlcPartNumberPattern = /^C\d+$/i
+
+const formatPadHints = (
+  hints: string[],
+  pinNumbers: number[],
+  padIndex: number | null,
+) => {
+  if (hints.length > 0) return hints.join(', ')
+  if (pinNumbers.length > 0) {
+    return pinNumbers.map((pinNumber) => `pin${pinNumber}`).join(', ')
+  }
+  return padIndex === null ? 'missing pad' : `pad ${padIndex + 1}`
+}
+
+const getMismatchLabel = (mismatch: PinMismatchDetail) =>
+  `${formatPadHints(
+    mismatch.leftPortHints,
+    mismatch.leftPinNumbers,
+    mismatch.leftPadIndex,
+  )} → ${formatPadHints(
+    mismatch.rightPortHints,
+    mismatch.rightPinNumbers,
+    mismatch.rightPadIndex,
+  )}`
 
 const getInputClassName = (hasError: boolean) =>
   hasError
@@ -534,14 +558,27 @@ function App() {
                   >
                     <span className="min-w-0">
                       <span className="block text-xs font-semibold uppercase tracking-wide text-blue-600">
-                        {index === 0 ? 'Best match' : candidate.family}
+                        {index === 0
+                          ? candidate.pinsMatch
+                            ? 'Best match'
+                            : 'Best geometry match'
+                          : candidate.family}
                       </span>
                       <code className="mt-1 block truncate text-xs text-slate-800">
                         {candidate.footprinterString}
                       </code>
                     </span>
-                    <span className="shrink-0 text-sm font-semibold text-slate-900">
-                      {formatPercent(candidate.copperIntersectionOverUnion)}
+                    <span className="shrink-0 text-right">
+                      <span className="block text-sm font-semibold text-slate-900">
+                        {formatPercent(candidate.copperIntersectionOverUnion)} copper
+                      </span>
+                      <span
+                        className={`mt-1 block text-xs font-medium ${
+                          candidate.pinsMatch ? 'text-emerald-700' : 'text-amber-700'
+                        }`}
+                      >
+                        {formatPercent(candidate.pinMatchRate)} pins
+                      </span>
                     </span>
                   </button>
                 ))}
@@ -573,6 +610,30 @@ function App() {
                     {hasComparedHoles
                       ? 'Shared drilled geometry across both aligned footprints.'
                       : 'Neither footprint contains drilled geometry.'}
+                  </p>
+                </article>
+
+                <article
+                  className={`min-w-0 rounded-2xl border p-5 ${
+                    compareResponse.pinsMatch
+                      ? 'border-emerald-100 bg-emerald-50'
+                      : 'border-amber-200 bg-amber-50'
+                  }`}
+                >
+                  <div className={sectionLabelClass}>Pin Match</div>
+                  <div className="mt-3 whitespace-nowrap text-4xl font-semibold tracking-tight text-slate-950">
+                    {formatPercent(compareResponse.pinMatchRate)}
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">
+                    {compareResponse.pinsMatch
+                      ? 'Numeric pin assignments match at every position.'
+                      : `${compareResponse.pinMismatches.length} position${
+                          compareResponse.pinMismatches.length === 1 ? '' : 's'
+                        } ${
+                          compareResponse.pinMismatches.length === 1
+                            ? 'has'
+                            : 'have'
+                        } different numeric pin assignments.`}
                   </p>
                 </article>
 
@@ -635,6 +696,25 @@ function App() {
                   </p>
                 </article>
               </section>
+
+              {!compareResponse.pinsMatch ? (
+                <section className="mt-4 rounded-2xl border border-amber-300 bg-amber-50 p-5">
+                  <div className={sectionLabelClass}>Pin Mapping Warning</div>
+                  <h2 className="mt-2 text-lg font-semibold text-amber-950">
+                    Copper geometry overlaps, but the pin mapping is not equivalent.
+                  </h2>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {compareResponse.pinMismatches.map((mismatch) => (
+                      <code
+                        className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-amber-900"
+                        key={`${mismatch.leftPadIndex}-${mismatch.rightPadIndex}`}
+                      >
+                        {getMismatchLabel(mismatch)}
+                      </code>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
 
               <section className="mt-6 grid min-w-0 gap-4 xl:grid-cols-2">
                 <article className={`${secondarySurfaceClass} flex min-w-0 flex-col p-5`}>
