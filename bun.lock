@@ -8,7 +8,7 @@
         "@tscircuit/footprinter": "^0.0.418",
         "@tscircuit/math-utils": "^0.0.36",
         "circuit-json": "^0.0.453",
-        "circuit-json-to-footprinter": "^0.0.44",
+        "circuit-json-to-footprinter": "^0.0.45",
         "easyeda": "^0.0.271",
         "express": "^5.2.1",
         "react": "^19.2.7",
@@ -218,7 +218,7 @@
 
     "circuit-json": ["circuit-json@0.0.453", "", { "peerDependencies": { "format-si-unit": "*" } }, "sha512-BxdRuD6WPlUXfwQjwZzX0dA9V6CsmusH5SK4UT34oheCU/XPGi+SZuUHfUTqvKd+V8LcCa68+Hjkdld7x4BG1Q=="],
 
-    "circuit-json-to-footprinter": ["circuit-json-to-footprinter@0.0.44", "", { "dependencies": { "@tscircuit/footprinter": "0.0.418", "@tscircuit/manifold-2d": "^0.0.6", "@tscircuit/math-utils": "^0.0.36", "circuit-json": "^0.0.453", "format-si-unit": "^0.0.10" } }, "sha512-Y+tJjHKBh2ynxXyysmZavFZRNuGo9RZ4FONHQ/KznSMabKrNvL/jILuclfOmGPMTVe8zTMG/PFBoupMVDTVa7g=="],
+    "circuit-json-to-footprinter": ["circuit-json-to-footprinter@0.0.45", "", { "dependencies": { "@tscircuit/footprinter": "0.0.418", "@tscircuit/manifold-2d": "^0.0.6", "@tscircuit/math-utils": "^0.0.36", "circuit-json": "^0.0.453", "format-si-unit": "^0.0.10" } }, "sha512-zHkrydbuYJmTH7rtuXK98oLp1Q/7JzOo5pYPIJyb3Kp0izXGMCRDcERFBvJs6pMsgC7keeIczg4kxgOb7bUhGA=="],
 
     "cliui": ["cliui@9.0.1", "", { "dependencies": { "string-width": "^7.2.0", "strip-ansi": "^7.1.0", "wrap-ansi": "^9.0.0" } }, "sha512-k7ndgKhwoQveBL+/1tqGJYNz097I7WOvwbmmU2AR5+magtbjPWQTS1C5vzGkBC8Ym8UWRzfKUzUUqFLypY4Q+w=="],
 
